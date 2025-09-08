@@ -54,7 +54,7 @@ const App = () => {
           <h2>Добавить фильм</h2>
           <form onSubmit={handleSubmit}>
             <div>
-              <label>Название: </label>
+              <label>Название *</label>
               <input
                 type="text"
                 value={title}
@@ -65,7 +65,7 @@ const App = () => {
             </div>
 
             <div>
-              <label>Жанр: </label>
+              <label>Жанр</label>
               <select value={genre} onChange={(e) => setGenre(e.target.value)}>
                 <option value="драма">Драма</option>
                 <option value="комедия">Комедия</option>
@@ -91,11 +91,10 @@ const App = () => {
 
             <div>
               <label>Обзор</label>
-              <br />
               <textarea
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
-                rows="5"
+                rows="3"
                 maxLength="500"
                 placeholder="Ваши впечатления (до 500 символов)"
               />
@@ -105,7 +104,7 @@ const App = () => {
             <button type="submit">Добавить</button>
           </form>
         </div>
- <br /> <br />
+
         <div className="movies-section">
           <div className="controls">
             <div>
@@ -126,8 +125,8 @@ const App = () => {
             <div>
               <label>Сортировка:</label>
               <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-                <option value="по убыванию">Высокие > Низкие</option>
-                <option value="по возрастанию">Низкие > Высокие</option>
+                <option value="по убыванию">Высокие → Низкие</option>
+                <option value="по возрастанию">Низкие → Высокие</option>
               </select>
             </div>
           </div>
@@ -135,7 +134,7 @@ const App = () => {
           <h2>Мои фильмы ({sortedMovies.length})</h2>
 
           {sortedMovies.length === 0 ? (
-            <p>Фильмов пока нет.</p>
+            <p>Фильмов пока нет. Добавьте первый!</p>
           ) : (
             <div className="movies-grid">
               {sortedMovies.map(movie => (
