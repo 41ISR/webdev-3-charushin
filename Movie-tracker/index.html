@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieTracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e59409;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .add-movie-form {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #e59409;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #f5f5f5;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .rating-slider {
+            margin: 15px 0;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #e59409;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #e59409;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e59409;
+        }
+
+        .filters {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .filter-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #e59409;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .movie-card {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            position: relative;
+        }
+
+        .movie-title {
+            font-size: 20px;
+            margin-bottom: 5px;
+            padding-right: 30px;
+        }
+
+        .movie-genre {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 18px;
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+        }
+
+        .delete-btn:hover {
+            color: #e59409;
+        }
+
+        .movie-body {
+            padding: 20px;
+        }
+
+        .movie-rating {
+            display: inline-block;
+            background-color: #e59409;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .movie-date {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .movie-review {
+            color: #ccc;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .no-movies {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+
+        .no-movies i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const MovieTracker = () => {
+            const [movies, setMovies] = useState([]);
+            const [filteredMovies, setFilteredMovies] = useState([]);
+            const [genreFilter, setGenreFilter] = useState('all');
+            const [sortOrder, setSortOrder] = useState('desc');
+            
+            // Состояние для формы добавления фильма
+            const [newMovie, setNewMovie] = useState({
+                title: '',
+                genre: 'драма',
+                rating: 5,
+                review: '',
+                date: new Date().toLocaleDateString('ru-RU')
+            });
+
+            // Загрузка фильмов из localStorage при монтировании
+            useEffect(() => {
+                const savedMovies = JSON.parse(localStorage.getItem('movies')) || [];
+                setMovies(savedMovies);
+                setFilteredMovies(savedMovies);
+            }, []);
+
+            // Сохранение фильмов в localStorage при изменении
+            useEffect(() => {
+                localStorage.setItem('movies', JSON.stringify(movies));
+                applyFilters();
+            }, [movies, genreFilter, sortOrder]);
+
+            // Применение фильтров и сортировки
+            const applyFilters = () => {
+                let result = [...movies];
+                
+                // Фильтрация по жанру
+                if (genreFilter !== 'all') {
+                    result = result.filter(movie => movie.genre === genreFilter);
+                }
+                
+                // Сортировка по оценке
+                result.sort((a, b) => {
+                    if (sortOrder === 'desc') {
+                        return b.rating - a.rating;
+                    } else {
+                        return a.rating - b.rating;
+                    }
+                });
+                
+                setFilteredMovies(result);
+            };
+
+            // Обработчик изменения полей формы
+            const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setNewMovie({
+                    ...newMovie,
+                    [name]: value
+                });
+            };
+
+            // Обработчик отправки формы
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (newMovie.title.trim() === '') return;
+                
+                setMovies([...movies, { ...newMovie, id: Date.now() }]);
+                
+                // Сброс формы
+                setNewMovie({
+                    title: '',
+                    genre: 'драма',
+                    rating: 5,
+                    review: '',
+                    date: new Date().toLocaleDateString('ru-RU')
+                });
+            };
+
+            // Удаление фильма
+            const deleteMovie = (id) => {
+                setMovies(movies.filter(movie => movie.id !== id));
+            };
+
+            return (
+                <div className="container">
+                    <header>
+                        <div className="logo">
+                            <i className="fas fa-film"></i>
+                            MovieTracker
+                        </div>
+                    </header>
+                    
+                    <div className="main-content">
+                        <div>
+                            <div className="add-movie-form">
+                                <h2 className="form-title">Добавить фильм</h2>
+                                <form onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <label htmlFor="title">Название фильма</label>
+                                        <input
+                                            type="text"
+                                            id="title"
+                                            name="title"
+                                            value={newMovie.title}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div className="form-group">
+                                        <label htmlFor="genre">Жанр</label>
+                                        <select
+                                            id="genre"
+                                            name="genre"
+                                            value={newMovie.genre}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option value="драма">Драма</option>
+                                            <option value="комедия">Комедия</option>
+                                            <option value="боевик">Боевик</option>
+                                            <option value="триллер">Триллер</option>
+                                            <option value="фантастика">Фантастика</option>
+                                            <option value="ужасы">Ужасы</option>
+                                            <option value="документальный">Документальный</option>
+                                            <option value="другое">Другое</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="form-group">
+                                        <label htmlFor="rating">Оценка: {newMovie.rating}</label>
+                                        <div className="rating-slider">
+                                            <input
+                                                type="range"
+                                                id="rating"
+                                                name="rating"
+                                                min="1"
+                                                max="10"
+                                                value={newMovie.rating}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                        <div className="slider-value">{newMovie.rating}/10</div>
+                                    </div>
+                                    
+                                    <div className="form-group">
+                                        <label htmlFor="review">Краткий обзор</label>
+                                        <textarea
+                                            id="review"
+                                            name="review"
+                                            value={newMovie.review}
+                                            onChange={handleInputChange}
+                                            maxLength="500"
+                                        ></textarea>
+                                        <small>{newMovie.review.length}/500 символов</small>
+                                    </div>
+                                    
+                                    <button type="submit">Добавить фильм</button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div className="filters">
+                                <h3 className="filter-title">Фильтры и сортировка</h3>
+                                <div style={{display: 'flex', gap: '20px', flexWrap: 'wrap'}}>
+                                    <div className="form-group" style={{flex: '1', minWidth: '200px'}}>
+                                        <label htmlFor="genre-filter">Жанр</label>
+                                        <select
+                                            id="genre-filter"
+                                            value={genreFilter}
+                                            onChange={(e) => setGenreFilter(e.target.value)}
+                                        >
+                                            <option value="all">Все жанры</option>
+                                            <option value="драма">Драма</option>
+                                            <option value="комедия">Комедия</option>
+                                            <option value="боевик">Боевик</option>
+                                            <option value="триллер">Триллер</option>
+                                            <option value="фантастика">Фантастика</option>
+                                            <option value="ужасы">Ужасы</option>
+                                            <option value="документальный">Документальный</option>
+                                            <option value="другое">Другое</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="form-group" style={{flex: '1', minWidth: '200px'}}>
+                                        <label htmlFor="sort-order">Сортировка по оценке</label>
+                                        <select
+                                            id="sort-order"
+                                            value={sortOrder}
+                                            onChange={(e) => setSortOrder(e.target.value)}
+                                        >
+                                            <option value="desc">По убыванию</option>
+                                            <option value="asc">По возрастанию</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="movies-grid">
+                                {filteredMovies.length > 0 ? (
+                                    filteredMovies.map(movie => (
+                                        <div key={movie.id} className="movie-card">
+                                            <div className="movie-header">
+                                                <h3 className="movie-title">{movie.title}</h3>
+                                                <div className="movie-genre">{movie.genre}</div>
+                                                <button 
+                                                    className="delete-btn"
+                                                    onClick={() => deleteMovie(movie.id)}
+                                                >
+                                                    <i className="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div className="movie-body">
+                                                <div className="movie-rating">
+                                                    {movie.rating}/10
+                                                </div>
+                                                <div className="movie-date">
+                                                    Добавлен: {movie.date}
+                                                </div>
+                                                <p className="movie-review">
+                                                    {movie.review.length > 100 
+                                                        ? `${movie.review.substring(0, 100)}...` 
+                                                        : movie.review
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="no-movies">
+                                        <i className="fas fa-film"></i>
+                                        <p>Фильмов не найдено. Добавьте первый!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MovieTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
